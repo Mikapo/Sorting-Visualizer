@@ -8,6 +8,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Window.hpp>
+#include <algorithm>
 #include <iostream>
 #include <random>
 #include <sstream>
@@ -47,7 +48,6 @@ mikalib::timer timer;
 sf::Font font;
 CursorPositionsData cursor_positions;
 
-
 template <typename T>
 void swap(std::vector<T>& input, size_t index_1, size_t index_2)
 {
@@ -57,8 +57,7 @@ void swap(std::vector<T>& input, size_t index_1, size_t index_2)
     input[index_2] = temp_value;
 }
 
-void UpdateVisualisation(
-    sf::RenderWindow* window, std::vector<RectangleData>& rectangles)
+void UpdateVisualisation(sf::RenderWindow* window, std::vector<RectangleData>& rectangles)
 {
     float position = 0;
     for (size_t i = 0; i < rectangles.size(); i++)
@@ -128,8 +127,7 @@ std::vector<RectangleData> create_rectangles(std::vector<float> sizes, float wid
 }
 
 template <typename T>
-void insertion_sort(
-    std::vector<T>& input, bool (*greater_than)(T a, T b), int delay = 0)
+void insertion_sort(std::vector<T>& input, bool (*greater_than)(T a, T b), int delay = 0)
 {
     int size = input.size();
     for (int i = 0; i < size; i++)
@@ -152,8 +150,7 @@ void insertion_sort(
 }
 
 template <typename T>
-void shell_sort(
-    std::vector<T>& input, bool (*greater_than)(T a, T b), int delay = 0)
+void shell_sort(std::vector<T>& input, bool (*greater_than)(T a, T b), int delay = 0)
 {
     int size = input.size();
     int h = 1;
@@ -185,8 +182,7 @@ void shell_sort(
 }
 
 template <typename T>
-void selection_sort(
-    std::vector<T>& input, bool (*greater_than)(T a, T b), int delay = 0)
+void selection_sort(std::vector<T>& input, bool (*greater_than)(T a, T b), int delay = 0)
 {
     int size = input.size();
     for (int i = 0; i < size; i++)
@@ -207,7 +203,8 @@ void selection_sort(
 }
 
 template <typename T>
-void merge(std::vector<T>& input, std::vector<T>& aux, int lo, int mid, int hi, bool (*higher_than)(T a, T b), int delay)
+void merge(
+    std::vector<T>& input, std::vector<T>& aux, int lo, int mid, int hi, bool (*higher_than)(T a, T b), int delay)
 {
     for (int i = lo; i <= hi; i++)
         aux[i] = input[i];
@@ -246,15 +243,16 @@ void merge(std::vector<T>& input, std::vector<T>& aux, int lo, int mid, int hi, 
 }
 
 template <typename T>
-void sort(std::vector<T>& input, std::vector<T>& aux, int lo, int hi, bool (*higher_than)(T a, T b), int delay)
+void merge_sort_recrussion(
+    std::vector<T>& input, std::vector<T>& aux, int lo, int hi, bool (*higher_than)(T a, T b), int delay)
 {
     if (hi <= lo)
         return;
 
     int mid = lo + (hi - lo) / 2;
-    
-    sort<T>(input, aux, lo, mid, higher_than, delay);
-    sort<T>(input, aux, mid + 1, hi, higher_than, delay);
+
+    merge_sort_recrussion<T>(input, aux, lo, mid, higher_than, delay);
+    merge_sort_recrussion<T>(input, aux, mid + 1, hi, higher_than, delay);
     merge<T>(input, aux, lo, mid, hi, higher_than, delay);
 }
 
@@ -266,9 +264,83 @@ void merge_sort(std::vector<T>& input, bool (*higher_than)(T a, T b), int delay)
     for (T item : input)
         aux.push_back(item);
 
-    sort<T>(input, aux, 0, input.size() - 1, higher_than, delay);
+    merge_sort_recrussion<T>(input, aux, 0, input.size() - 1, higher_than, delay);
     timer.stop();
 }
+
+template <typename T>
+void botton_up_merge_sort(std::vector<T>& input, bool (*higher_than)(T a, T b), int delay)
+{
+    std::vector<T> aux;
+    aux.reserve(input.size());
+    for (T item : input)
+        aux.push_back(item);
+
+    for (int i = 1; i < input.size(); i = i + i)
+        for (int a = 0; a < input.size() - i; a += i + i)
+            merge(
+                input, aux, a, a + i - 1, std::min(a + i + i - 1, static_cast<int>(input.size() - 1)), higher_than,
+                delay);
+
+    timer.stop();
+}
+
+template <typename T>
+int partition(std::vector<T>& input, int lo, int hi, bool (*higher_than)(T a, T b), int delay)
+{
+    int i = lo, j = hi + 1;
+
+    while (true)
+    {
+        while (!higher_than(input[++i], input[lo]))
+        {
+            ++comparisons;
+            if (i == hi)
+                break;
+        }
+           
+
+        while (!higher_than(input[lo], input[--j]))
+        {
+            ++comparisons;
+            if (j == lo)
+                break;
+        }
+            
+
+          if (i >= j)
+              break;
+
+          std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+          cursor_positions.SecondCursor = j;
+          cursor_positions.FirstCursor = i;
+          swap(input, i, j);
+    }
+
+    swap(input, lo, j);
+    return j;
+}
+
+template<typename T>
+void quick_sort_recrussion(std::vector<T>& input, int lo, int hi, bool (*higher_than)(T a, T b), int delay)
+{
+    if (hi <= lo)
+        return;
+
+    int j = partition<T>(input, lo, hi, higher_than, delay);
+    quick_sort_recrussion<T>(input, lo, j - 1, higher_than, delay);
+    quick_sort_recrussion<T>(input, j + 1, hi, higher_than, delay);
+}
+
+template <typename T>
+void quick_sort(std::vector<T>& input, bool (*higher_than)(T a, T b), int delay)
+{
+    auto rng = std::default_random_engine{};
+    std::shuffle(std::begin(input), std::end(input), rng);
+    quick_sort_recrussion<T>(input, 0, input.size() - 1, higher_than, delay);
+    timer.stop();
+}
+
 
 InputData inputs()
 {
@@ -291,13 +363,15 @@ InputData inputs()
     std::cout << "InsertionSort" << std::endl;
     std::cout << "ShellSort" << std::endl;
     std::cout << "MergeSort" << std::endl;
+    std::cout << "BottonUpMergeSort" << std::endl;
 
     std::string type;
     while (true)
     {
         std::cin >> type;
 
-        if (type == "SelectionSort" || type == "InsertionSort" || type == "ShellSort" || "MergeSort")
+        if (type == "SelectionSort" || type == "InsertionSort" || type == "ShellSort" || type == "MergeSort" ||
+            type == "BottonUpMergeSort" || type == "QuickSort")
         {
             input.sort = type;
             break;
@@ -350,16 +424,17 @@ int main()
 
     std::thread thread;
     if (input.sort == "SelectionSort")
-        thread = std::thread(
-            selection_sort<RectangleData>, std::ref(rectangles), greater_than, input.delay);
+        thread = std::thread(selection_sort<RectangleData>, std::ref(rectangles), greater_than, input.delay);
     else if (input.sort == "InsertionSort")
-        thread = std::thread(
-            insertion_sort<RectangleData>, std::ref(rectangles), greater_than, input.delay);
+        thread = std::thread(insertion_sort<RectangleData>, std::ref(rectangles), greater_than, input.delay);
     else if (input.sort == "ShellSort")
-        thread = std::thread(
-            shell_sort<RectangleData>, std::ref(rectangles), greater_than, input.delay);
+        thread = std::thread(shell_sort<RectangleData>, std::ref(rectangles), greater_than, input.delay);
     else if (input.sort == "MergeSort")
         thread = std::thread(merge_sort<RectangleData>, std::ref(rectangles), greater_than, input.delay);
+    else if (input.sort == "BottonUpMergeSort")
+        thread = std::thread(botton_up_merge_sort<RectangleData>, std::ref(rectangles), greater_than, input.delay);
+    else if (input.sort == "QuickSort")
+        thread = std::thread(quick_sort<RectangleData>, std::ref(rectangles), greater_than, input.delay);
 
     Render(rectangles);
 }
