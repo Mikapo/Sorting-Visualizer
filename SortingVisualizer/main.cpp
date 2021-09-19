@@ -276,10 +276,10 @@ void botton_up_merge_sort(std::vector<T>& input, bool (*higher_than)(T a, T b), 
     for (T item : input)
         aux.push_back(item);
 
-    for (int i = 1; i < input.size(); i = i + i)
-        for (int a = 0; a < input.size() - i; a += i + i)
+    for (size_t i = 1; i < input.size(); i = i + i)
+        for (size_t a = 0; a < input.size() - i; a += i + i)
             merge(
-                input, aux, a, a + i - 1, std::min(a + i + i - 1, static_cast<int>(input.size() - 1)), higher_than,
+                input, aux, a, a + i - 1, std::min(a + i + i - 1, input.size() - 1), higher_than,
                 delay);
 
     timer.stop();
@@ -364,6 +364,7 @@ InputData inputs()
     std::cout << "ShellSort" << std::endl;
     std::cout << "MergeSort" << std::endl;
     std::cout << "BottonUpMergeSort" << std::endl;
+    std::cout << "QuickSort" << std::endl;
 
     std::string type;
     while (true)
