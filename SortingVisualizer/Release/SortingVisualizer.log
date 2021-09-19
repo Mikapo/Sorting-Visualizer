@@ -1,2 +1,7 @@
 ﻿  main.cpp
-D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizer\main.cpp(126,13): error C2760: syntax error: unexpected token 'if', expected ';'
+  Generating code
+  3 of 535 functions ( 0.6%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  SortingVisualizer.vcxproj -> D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\Release\SortingVisualizer.exe

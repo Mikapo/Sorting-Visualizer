@@ -1,3 +1,7 @@
+
+#include "MergeSort.h"
+#include "Timer.h"
+
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -10,17 +14,6 @@
 #include <string.h>
 #include <thread>
 #include <vector>
-#include "Timer.h"
-#include "main.h"
-
-bool finished = false;
-int comparisons = 0;
-int swaps = 0;
-sf::Text swap_text;
-sf::Text comparsion_text;
-sf::Text timer_text;
-mikalib::timer timer;
-sf::Font font;
 
 struct RectangleData
 {
@@ -43,6 +36,18 @@ struct CursorPositionsData
     int SecondCursor = 0;
 };
 
+int comparisons = 0;
+int swaps = 0;
+sf::Text sort_text;
+sf::Text items_text;
+sf::Text swap_text;
+sf::Text comparsion_text;
+sf::Text timer_text;
+mikalib::timer timer;
+sf::Font font;
+CursorPositionsData cursor_positions;
+
+
 template <typename T>
 void swap(std::vector<T>& input, size_t index_1, size_t index_2)
 {
@@ -53,7 +58,7 @@ void swap(std::vector<T>& input, size_t index_1, size_t index_2)
 }
 
 void UpdateVisualisation(
-    sf::RenderWindow* window, std::vector<RectangleData>& rectangles, const CursorPositionsData& cursor_positions)
+    sf::RenderWindow* window, std::vector<RectangleData>& rectangles)
 {
     float position = 0;
     for (size_t i = 0; i < rectangles.size(); i++)
@@ -76,16 +81,16 @@ void UpdateVisualisation(
 
     comparsion_text.setString("Comparisons: " + std::to_string(comparisons));
     swap_text.setString("Swaps: " + std::to_string(swaps));
-    timer_text.setString("Time: " + std::to_string((int)timer.get_current_time()) + " ms");
+    timer_text.setString("Time: " + std::to_string(timer.get_current_time() / 1000) + " s");
 
+    window->draw(sort_text);
+    window->draw(items_text);
     window->draw(comparsion_text);
     window->draw(swap_text);
     window->draw(timer_text);
-
-
 }
 
-void Render(std::vector<RectangleData>& rectangles, const CursorPositionsData& cursor_positions)
+void Render(std::vector<RectangleData>& rectangles)
 {
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "My window");
 
@@ -97,13 +102,10 @@ void Render(std::vector<RectangleData>& rectangles, const CursorPositionsData& c
             if (event.type == sf::Event::Closed)
                 window.close();
         }
-        
-        if (!finished)
-        {
-            window.clear(sf::Color::Black);
-            UpdateVisualisation(&window, rectangles, cursor_positions);
-            window.display();
-        }
+
+        window.clear(sf::Color::Black);
+        UpdateVisualisation(&window, rectangles);
+        window.display();
     }
 }
 
@@ -127,15 +129,15 @@ std::vector<RectangleData> create_rectangles(std::vector<float> sizes, float wid
 
 template <typename T>
 void insertion_sort(
-    std::vector<T>& input, CursorPositionsData& CursorPosition, bool (*greater_than)(T a, T b), int delay = 0)
+    std::vector<T>& input, bool (*greater_than)(T a, T b), int delay = 0)
 {
     int size = input.size();
     for (int i = 0; i < size; i++)
     {
-        CursorPosition.FirstCursor = i;
+        cursor_positions.FirstCursor = i;
         for (int a = i; a > 0; a--)
         {
-            CursorPosition.SecondCursor = a;
+            cursor_positions.SecondCursor = a;
             std::this_thread::sleep_for(std::chrono::milliseconds(delay));
             comparisons++;
             if (!greater_than(input[a], input[a - 1]))
@@ -146,12 +148,12 @@ void insertion_sort(
                 break;
         }
     }
-    finished = true;
+    timer.stop();
 }
 
 template <typename T>
 void shell_sort(
-    std::vector<T>& input, CursorPositionsData& CursorPosition, bool (*greater_than)(T a, T b), int delay = 0)
+    std::vector<T>& input, bool (*greater_than)(T a, T b), int delay = 0)
 {
     int size = input.size();
     int h = 1;
@@ -162,10 +164,10 @@ void shell_sort(
     {
         for (int i = h; i < size; i++)
         {
-            CursorPosition.FirstCursor = i;
+            cursor_positions.FirstCursor = i;
             for (int a = i; a >= h; a -= h)
             {
-                CursorPosition.SecondCursor = a;
+                cursor_positions.SecondCursor = a;
                 std::this_thread::sleep_for(std::chrono::milliseconds(delay));
                 comparisons++;
                 if (!greater_than(input[a], input[a - h]))
@@ -179,29 +181,93 @@ void shell_sort(
         h = h / 3;
     }
 
-    finished = true;
+    timer.stop();
 }
 
 template <typename T>
 void selection_sort(
-    std::vector<T>& input, CursorPositionsData& CursorPosition, bool (*greater_than)(T a, T b), int delay = 0)
+    std::vector<T>& input, bool (*greater_than)(T a, T b), int delay = 0)
 {
     int size = input.size();
     for (int i = 0; i < size; i++)
     {
-        CursorPosition.FirstCursor = i;
+        cursor_positions.FirstCursor = i;
         size_t smallest_value = i;
         for (int a = i + 1; a < size; a++)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(delay));
-            CursorPosition.SecondCursor = a;
+            cursor_positions.SecondCursor = a;
             comparisons++;
             if (greater_than(input[smallest_value], input[a]))
                 smallest_value = a;
         }
         swap<T>(input, i, smallest_value);
     }
-    finished = true;
+    timer.stop();
+}
+
+template <typename T>
+void merge(std::vector<T>& input, std::vector<T>& aux, int lo, int mid, int hi, bool (*higher_than)(T a, T b), int delay)
+{
+    for (int i = lo; i <= hi; i++)
+        aux[i] = input[i];
+
+    int i = lo, j = mid + 1;
+    for (int k = lo; k <= hi; k++)
+    {
+        cursor_positions.FirstCursor = mid;
+        cursor_positions.SecondCursor = k;
+        std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+        if (i > mid)
+        {
+            input[k] = aux[j];
+            ++j;
+        }
+        else if (j > hi)
+        {
+            input[k] = aux[i];
+            ++i;
+        }
+        else if (!higher_than(aux[j], aux[i]))
+        {
+            ++comparisons;
+            ++swaps;
+            input[k] = aux[j];
+            ++j;
+        }
+        else
+        {
+            ++comparisons;
+            ++swaps;
+            input[k] = aux[i];
+            ++i;
+        }
+    }
+}
+
+template <typename T>
+void sort(std::vector<T>& input, std::vector<T>& aux, int lo, int hi, bool (*higher_than)(T a, T b), int delay)
+{
+    if (hi <= lo)
+        return;
+
+    int mid = lo + (hi - lo) / 2;
+    
+    sort<T>(input, aux, lo, mid, higher_than, delay);
+    sort<T>(input, aux, mid + 1, hi, higher_than, delay);
+    merge<T>(input, aux, lo, mid, hi, higher_than, delay);
+}
+
+template <typename T>
+void merge_sort(std::vector<T>& input, bool (*higher_than)(T a, T b), int delay)
+{
+    std::vector<T> aux;
+    aux.reserve(input.size());
+    for (T item : input)
+        aux.push_back(item);
+
+    sort<T>(input, aux, 0, input.size() - 1, higher_than, delay);
+    timer.stop();
 }
 
 InputData inputs()
@@ -224,13 +290,14 @@ InputData inputs()
     std::cout << "SelectionSort" << std::endl;
     std::cout << "InsertionSort" << std::endl;
     std::cout << "ShellSort" << std::endl;
+    std::cout << "MergeSort" << std::endl;
 
     std::string type;
     while (true)
     {
         std::cin >> type;
 
-        if (type == "SelectionSort" || type == "InsertionSort" || type == "ShellSort")
+        if (type == "SelectionSort" || type == "InsertionSort" || type == "ShellSort" || "MergeSort")
         {
             input.sort = type;
             break;
@@ -244,41 +311,55 @@ InputData inputs()
     return input;
 }
 
-void CreateText()
+void CreateText(std::string sort, size_t items)
 {
     font.loadFromFile("Roboto.ttf");
+
+    sort_text.setFont(font);
+    sort_text.setCharacterSize(15);
+    sort_text.setString(sort);
+
+    items_text.setFont(font);
+    items_text.setCharacterSize(15);
+    items_text.setPosition(0, 20);
+    items_text.setString("Items: " + std::to_string(items));
+
     comparsion_text.setFont(font);
-    comparsion_text.setCharacterSize(20);
+    comparsion_text.setCharacterSize(15);
+    comparsion_text.setPosition(0, 40);
+
     swap_text.setFont(font);
-    swap_text.setCharacterSize(20);
-    swap_text.setPosition(0, 25);
+    swap_text.setCharacterSize(15);
+    swap_text.setPosition(0, 60);
+
     timer_text.setFont(font);
-    timer_text.setCharacterSize(20);
-    timer_text.setPosition(0, 50);
+    timer_text.setCharacterSize(15);
+    timer_text.setPosition(0, 80);
+
     timer.start();
 }
 
 int main()
 {
-    
-    CreateText();
 
     InputData input = inputs();
+    CreateText(input.sort, input.sizes.size());
     std::vector<RectangleData> rectangles = create_rectangles(input.sizes, 1900.0f / input.sizes.size());
 
     auto greater_than = [](RectangleData a, RectangleData b) { return a.m_size > b.m_size; };
-    CursorPositionsData CursorPositions;
 
     std::thread thread;
     if (input.sort == "SelectionSort")
         thread = std::thread(
-            selection_sort<RectangleData>, std::ref(rectangles), std::ref(CursorPositions), greater_than, input.delay);
+            selection_sort<RectangleData>, std::ref(rectangles), greater_than, input.delay);
     else if (input.sort == "InsertionSort")
         thread = std::thread(
-            insertion_sort<RectangleData>, std::ref(rectangles), std::ref(CursorPositions), greater_than, input.delay);
+            insertion_sort<RectangleData>, std::ref(rectangles), greater_than, input.delay);
     else if (input.sort == "ShellSort")
         thread = std::thread(
-            shell_sort<RectangleData>, std::ref(rectangles), std::ref(CursorPositions), greater_than, input.delay);
+            shell_sort<RectangleData>, std::ref(rectangles), greater_than, input.delay);
+    else if (input.sort == "MergeSort")
+        thread = std::thread(merge_sort<RectangleData>, std::ref(rectangles), greater_than, input.delay);
 
-    Render(rectangles, CursorPositions);
+    Render(rectangles);
 }
