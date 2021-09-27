@@ -106,18 +106,12 @@ void visualizer_window::setup_window()
 void visualizer_window::handle_imgui(class sorter& sorter_instance)
 {
     ImGuiWindowFlags window_flags = 0;
-    window_flags |= ImGuiWindowFlags_NoResize;
+    window_flags |= ImGuiWindowFlags_NoDecoration;
+    window_flags |= ImGuiWindowFlags_NoMove;
     static bool open = true;
     ImGui::Begin("Sort Visualizer", &open, window_flags);
-   
-
-    if (ImGui::Button("Start"))
-        sorter_instance.start_sort();
-
-    ImGui::SameLine();
-
-    if (ImGui::Button("Stop"))
-        sorter_instance.stop_sort();
+    ImGui::SetWindowPos(ImVec2(0, 0));
+    ImGui::SetWindowSize(ImVec2(300,200));
 
     if (ImGui::Button("Randomize"))
         sorter_instance.randomize();
@@ -164,8 +158,18 @@ void visualizer_window::handle_imgui(class sorter& sorter_instance)
     else if (current_item == "QuickSort")
         sorter_instance.set_sort(sorts::quick_sort);
 
-    std::string text = "Comparisons: " + std::to_string(sorter_instance.get_output().comparisons) +
-                       " Swaps: " + std::to_string(sorter_instance.get_output().swaps);
+    ImGui::Dummy(ImVec2(10, 50));
+
+    if (ImGui::Button("Start", ImVec2(100, 20)))
+        sorter_instance.start_sort();
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Stop", ImVec2(100, 20)))
+        sorter_instance.stop_sort();
+
+     std::string text = "Comparisons: " + std::to_string(sorter_instance.get_output().comparisons) +
+                       "     Swaps: " + std::to_string(sorter_instance.get_output().swaps);
     ImGui::Text(text.c_str());
 
     ImGui::End();
