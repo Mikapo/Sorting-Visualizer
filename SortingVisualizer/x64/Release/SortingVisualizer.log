@@ -1,0 +1,43 @@
+﻿  main.cpp
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizer\main.cpp(187,1): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizer\main.cpp(428): message : see reference to function template instantiation 'void selection_sort<RectangleData>(std::vector<RectangleData,std::allocator<RectangleData>> &,bool (__cdecl *)(T,T),int)' being compiled
+          with
+          [
+              T=RectangleData
+          ]
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizer\main.cpp(132,1): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizer\main.cpp(430): message : see reference to function template instantiation 'void insertion_sort<RectangleData>(std::vector<RectangleData,std::allocator<RectangleData>> &,bool (__cdecl *)(T,T),int)' being compiled
+          with
+          [
+              T=RectangleData
+          ]
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizer\main.cpp(155,1): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizer\main.cpp(432): message : see reference to function template instantiation 'void shell_sort<RectangleData>(std::vector<RectangleData,std::allocator<RectangleData>> &,bool (__cdecl *)(T,T),int)' being compiled
+          with
+          [
+              T=RectangleData
+          ]
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizer\main.cpp(267,1): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizer\main.cpp(434): message : see reference to function template instantiation 'void merge_sort<RectangleData>(std::vector<RectangleData,std::allocator<RectangleData>> &,bool (__cdecl *)(T,T),int)' being compiled
+          with
+          [
+              T=RectangleData
+          ]
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizer\main.cpp(283,1): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizer\main.cpp(436): message : see reference to function template instantiation 'void botton_up_merge_sort<RectangleData>(std::vector<RectangleData,std::allocator<RectangleData>> &,bool (__cdecl *)(T,T),int)' being compiled
+          with
+          [
+              T=RectangleData
+          ]
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizer\main.cpp(340,1): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizer\main.cpp(438): message : see reference to function template instantiation 'void quick_sort<RectangleData>(std::vector<RectangleData,std::allocator<RectangleData>> &,bool (__cdecl *)(T,T),int)' being compiled
+          with
+          [
+              T=RectangleData
+          ]
+  Generating code
+  21 of 573 functions ( 3.7%) were compiled, the rest were copied from previous compilation.
+    2 functions were new in current compilation
+    35 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  SortingVisualizer.vcxproj -> D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\x64\Release\SortingVisualizer.exe

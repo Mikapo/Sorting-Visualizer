@@ -1,0 +1,13 @@
+﻿  VisualizerWindow.cpp
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizerV2\source\VisualizerWindow.cpp(53,65): warning C4305: 'argument': truncation from 'double' to 'float'
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizerV2\source\VisualizerWindow.cpp(55,92): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+ImGui.lib(imgui_impl_glfw.obj) : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/OPT:ICF' specification
+LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
+LINK : warning LNK4098: defaultlib 'MSVCRTD' conflicts with use of other libs; use /NODEFAULTLIB:library
+  Generating code
+  2 of 1279 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+glew32s.lib(glew.obj) : warning LNK4099: PDB 'vc120.pdb' was not found with 'glew32s.lib(glew.obj)' or at 'D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\x64\Release\vc120.pdb'; linking object as if no debug info
+  SortingVisualizerV2.vcxproj -> D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\x64\Release\SortingVisualizerV2.exe
