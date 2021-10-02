@@ -6,8 +6,14 @@ sorter::sorter() : m_current_sort(sorts::selection_sort), m_max_size(75), m_dela
     m_items.reserve(20);
     for (unsigned int i = 0; i < 20; i++)
     {
-        m_items.push_back((rand() % 10) + 1);
+        m_items.push_back((rand() % m_max_size) + 1);
     }
+}
+
+sorter::~sorter()
+{
+    m_is_sorting = false;
+    m_sorting._Is_ready();
 }
 
 void sorter::set_size(unsigned int size)
@@ -88,6 +94,12 @@ void sorter::start_sort()
     case sorts::quick_sort:
         m_sorting = std::async(
             std::launch::async, quick_sort, std::ref(m_items), std::ref(m_output), std::ref(m_is_sorting), m_delay,
+            greater_than);
+        break;
+
+    case sorts::heap_sort:
+        m_sorting = std::async(
+            std::launch::async, heap_sort, std::ref(m_items), std::ref(m_output), std::ref(m_is_sorting), m_delay,
             greater_than);
         break;
     }
@@ -187,6 +199,8 @@ void sorter::shell_sort(
         }
         h = h / 3;
     }
+
+    on_going = false;
 }
 
 void sorter::merge(
@@ -279,6 +293,7 @@ void sorter::botton_up_merge_sort(
                 input, aux, output, on_going, a, a + i - 1, std::min(a + i + i - 1, input.size() - 1), greater_than,
                 delay);
         }
+    on_going = false;
 }
 
 int sorter::partition(
@@ -321,6 +336,61 @@ int sorter::partition(
 
     swap(input, lo, j);
     return j;
+}
+
+void sorter::heap_sort(
+    std::vector<int>& input, sorting_output& output, bool& on_going, int delay, bool (*greater_than)(int a, int b))
+{
+    int size = input.size();
+    output.first_cursor_position = size - 1;
+    for (int i = (size / 2); i >= 0; i--)
+    {
+        if (!on_going)
+            return;
+        sink(input, output, on_going, delay, i, size, greater_than);
+    }
+
+    while (size > 1)
+    {
+        if (!on_going)
+            return;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+        ++output.swaps;
+        output.first_cursor_position = size - 1;
+        swap(input, 0, size - 1);
+        sink(input, output, on_going, delay, 0, --size, greater_than);
+    }
+
+    on_going = false;
+}
+
+void sorter::sink(
+    std::vector<int>& input, sorting_output& output, bool& on_going, int delay, int index, int size,
+    bool (*greater_than)(int a, int b))
+{
+    while ((index * 2) <= size-1)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+        int j = 2 * index;
+
+        output.second_cursor_position = index;
+
+        ++output.comparisons;
+        if (j < size - 1 && !greater_than(input[j], input[j + 1]))
+            ++j;
+
+        ++output.comparisons;
+        if (greater_than(input[index], input[j]) || input[index] == input[j])
+            break;
+
+        if (!on_going)
+            return;
+
+        ++output.swaps;
+        swap(input, index, j);
+        index = j;
+    }
 }
 
 void sorter::quick_sort_recrussion(

@@ -119,7 +119,7 @@
       <AdditionalIncludeDirectories>D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\ImGui;D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizerV2\headers;$(SolutionDir)libraries\GLEW\include\GL;$(SolutionDir)libraries\GLFW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>NotSet</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)libraries\GLEW\lib\Release\x64;D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\x64\Debug;$(SolutionDir)libraries\GLFW\lib-vc2019\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;glew32s.lib;ImGui.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -136,7 +136,7 @@
       <AdditionalIncludeDirectories>D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\ImGui;D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizerV2\headers;$(SolutionDir)libraries\GLEW\include\GL;$(SolutionDir)libraries\GLFW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>NotSet</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -161,6 +161,7 @@
     <ClInclude Include="source\Rendering\VertexBuffer.h" />
     <ClInclude Include="source\Rendering\VertexBufferLayout.h" />
     <ClInclude Include="source\Sorter.h" />
+    <ClInclude Include="source\Sorts\HeapSort.h" />
     <ClInclude Include="source\VisualizerWindow.h" />
     <ClInclude Include="source\Rendering\VertexBuffer.cpp" />
   </ItemGroup>

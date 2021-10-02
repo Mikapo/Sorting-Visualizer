@@ -1,4 +1,8 @@
-﻿  VisualizerWindow.cpp
-D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizerV2\source\VisualizerWindow.cpp(53,65): warning C4305: 'argument': truncation from 'double' to 'float'
-D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizerV2\source\VisualizerWindow.cpp(55,92): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+﻿  Sorter.cpp
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizerV2\source\Sorter.cpp(146,28): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizerV2\source\Sorter.cpp(173,28): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizerV2\source\Sorter.cpp(275,97): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizerV2\source\Sorter.cpp(294,22): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizerV2\source\Sorter.cpp(344,28): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\SortingVisualizerV2\source\Sorter.cpp(416,92): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
   SortingVisualizerV2.vcxproj -> D:\Users\Mika\Documents\Visual studio c++\SortingVisualizer\x64\Debug\SortingVisualizerV2.exe

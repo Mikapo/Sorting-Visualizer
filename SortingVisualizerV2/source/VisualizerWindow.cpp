@@ -111,13 +111,13 @@ void visualizer_window::handle_imgui(class sorter& sorter_instance)
     static bool open = true;
     ImGui::Begin("Sort Visualizer", &open, window_flags);
     ImGui::SetWindowPos(ImVec2(0, 0));
-    ImGui::SetWindowSize(ImVec2(300,200));
+    ImGui::SetWindowSize(ImVec2(300, 200));
 
     if (ImGui::Button("Randomize"))
         sorter_instance.randomize();
 
     static int items_amount = 20;
-    ImGui::SliderInt("Items", &items_amount, 20, 6000);
+    ImGui::SliderInt("Items", &items_amount, 20, 500);
 
     if (items_amount != sorter_instance.get_size())
         sorter_instance.set_size(items_amount);
@@ -128,8 +128,14 @@ void visualizer_window::handle_imgui(class sorter& sorter_instance)
     if (new_delay != sorter_instance.get_delay())
         sorter_instance.set_delay(new_delay);
 
-    const char* items[] = {"SelectionSort", "InsertionSort",     "ShellSort",
-                           "MergeSort",     "BottonUpMergeSort", "QuickSort"};
+    static int new_max_size = 75;
+    ImGui::SliderInt("Max size", &new_max_size, 2, 100);
+
+    if (new_max_size != sorter_instance.get_max_size())
+        sorter_instance.set_max_size(new_max_size);
+
+    const char* items[] = {"SelectionSort",     "InsertionSort", "ShellSort", "MergeSort",
+                           "BottonUpMergeSort", "QuickSort",     "HeapSort"};
     static const char* current_item = nullptr;
 
     if (ImGui::BeginCombo("Sort", current_item))
@@ -157,8 +163,10 @@ void visualizer_window::handle_imgui(class sorter& sorter_instance)
         sorter_instance.set_sort(sorts::botton_up_merge_sort);
     else if (current_item == "QuickSort")
         sorter_instance.set_sort(sorts::quick_sort);
+    else if (current_item == "HeapSort")
+        sorter_instance.set_sort(sorts::heap_sort);
 
-    ImGui::Dummy(ImVec2(10, 50));
+    ImGui::Dummy(ImVec2(10, 30));
 
     if (ImGui::Button("Start", ImVec2(100, 20)))
         sorter_instance.start_sort();
@@ -168,7 +176,7 @@ void visualizer_window::handle_imgui(class sorter& sorter_instance)
     if (ImGui::Button("Stop", ImVec2(100, 20)))
         sorter_instance.stop_sort();
 
-     std::string text = "Comparisons: " + std::to_string(sorter_instance.get_output().comparisons) +
+    std::string text = "Comparisons: " + std::to_string(sorter_instance.get_output().comparisons) +
                        "     Swaps: " + std::to_string(sorter_instance.get_output().swaps);
     ImGui::Text(text.c_str());
 
@@ -192,8 +200,8 @@ void visualizer_window::draw_item(
     };
 
     float width = 2.0f / static_cast<float>(max_items);
-    point2d first_point = {(width * position) - 1, -1};
-    point2d second_point = {first_point.X + width, -1};
+    point2d first_point = {(width * position) - 1 + 0.5 / max_items, -1};
+    point2d second_point = {first_point.X + width - 0.5 / max_items, -1};
     point2d third_point = {first_point.X, (static_cast<float>(size) / 50.0f) - 1};
     point2d fourth_point = {second_point.X, (static_cast<float>(size) / 50.0f) - 1};
 

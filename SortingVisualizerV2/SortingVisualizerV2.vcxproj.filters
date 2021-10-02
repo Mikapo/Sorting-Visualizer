@@ -65,6 +65,9 @@
     <ClInclude Include="source\Sorter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\Sorts\HeapSort.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\Shader.shader" />

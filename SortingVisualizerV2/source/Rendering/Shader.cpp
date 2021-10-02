@@ -32,7 +32,7 @@ int shader::get_uniform_location(const std::string& name) const
     int location = glGetUniformLocation(m_shader_id, name.c_str());
     if (location == -1)
     {
-        std::cout << " warning: uniform " << name << " does not exist ";
+        //std::cout << " warning: uniform " << name << " does not exist ";
         return -1;
     }
     else

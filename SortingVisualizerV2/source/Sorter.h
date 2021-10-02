@@ -10,7 +10,8 @@ enum class sorts
     shell_sort,
     merge_sort,
     botton_up_merge_sort,
-    quick_sort
+    quick_sort,
+    heap_sort
 };
 
 struct sorting_output
@@ -27,6 +28,7 @@ class sorter
 {
 public:
     sorter();
+    ~sorter();
 
     void set_size(unsigned int size);
     void set_sort(sorts sort);
@@ -35,13 +37,18 @@ public:
     void start_sort();
     void stop_sort();
 
-    inline void set_max_size(unsigned int new_size) { m_max_size = new_size; }
+    inline void set_max_size(unsigned int new_size)
+    {
+        m_max_size = new_size;
+        randomize();
+    }
     inline void set_delay(unsigned int new_delay) { m_delay = new_delay; };
 
     inline size_t get_size() const { return m_items.size(); }
     inline const std::vector<int>& get_items() const { return m_items; }
     inline const sorting_output& get_output() const { return m_output; }
     inline unsigned int get_delay() const { return m_delay; };
+    inline unsigned int get_max_size() const { return m_max_size; }
     inline bool is_sorting() const { return m_is_sorting; }
 
 private:
@@ -52,6 +59,7 @@ private:
         std::vector<int>& input, sorting_output& output, bool& on_going, int delay, bool (*greater_than)(int a, int b));
     static void shell_sort(
         std::vector<int>& input, sorting_output& output, bool& on_going, int delay, bool (*greater_than)(int a, int b));
+
     static void merge_sort(
         std::vector<int>& input, sorting_output& output, bool& on_going, int delay, bool (*greater_than)(int a, int b));
     static void merge_sort_recrussion(
@@ -62,6 +70,7 @@ private:
         bool (*higher_than)(int a, int b), int delay);
     static void botton_up_merge_sort(
         std::vector<int>& input, sorting_output& output, bool& on_going, int delay, bool (*greater_than)(int a, int b));
+
     static void quick_sort(
         std::vector<int>& input, sorting_output& output, bool& on_going, int delay, bool (*greater_than)(int a, int b));
     static void quick_sort_recrussion(
@@ -70,6 +79,11 @@ private:
     static int partition(
         std::vector<int>& input, sorting_output& output, bool& on_going, int lo, int hi,
         bool (*higher_than)(int a, int b), int delay);
+
+    static void heap_sort(std::vector<int>& input, sorting_output& output, bool& on_going, int delay, bool (*greater_than)(int a, int b));
+    static void sink(
+        std::vector<int>& input, sorting_output& output, bool& on_going, int delay, int index,
+        int size, bool (*greater_than)(int a, int b));
 
     std::vector<int> m_items;
     sorts m_current_sort;
