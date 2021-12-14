@@ -1,7 +1,4 @@
 #include "VisualizerWindow.h"
-#include <iostream>
-
-#include "Sorts/HeapSort.h"
 
 int WinMain()
 {

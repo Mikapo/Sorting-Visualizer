@@ -111,7 +111,7 @@ void visualizer_window::handle_imgui(class sorter& sorter_instance)
     static bool open = true;
     ImGui::Begin("Sort Visualizer", &open, window_flags);
     ImGui::SetWindowPos(ImVec2(0, 0));
-    ImGui::SetWindowSize(ImVec2(300, 200));
+    ImGui::SetWindowSize(ImVec2(300, 225));
 
     if (ImGui::Button("Randomize"))
         sorter_instance.randomize();
@@ -123,7 +123,7 @@ void visualizer_window::handle_imgui(class sorter& sorter_instance)
         sorter_instance.set_size(items_amount);
 
     static int new_delay = 20;
-    ImGui::SliderInt("Delay(ms)", &new_delay, 0, 100);
+    ImGui::SliderInt("Delay(ms)", &new_delay, 0, 300);
 
     if (new_delay != sorter_instance.get_delay())
         sorter_instance.set_delay(new_delay);
@@ -165,6 +165,12 @@ void visualizer_window::handle_imgui(class sorter& sorter_instance)
         sorter_instance.set_sort(sorts::quick_sort);
     else if (current_item == "HeapSort")
         sorter_instance.set_sort(sorts::heap_sort);
+
+    static bool reverse_sort = false;
+    ImGui::Checkbox("Reverse sort", &reverse_sort);
+
+    if (reverse_sort != sorter_instance.is_reverse_sorting())
+        sorter_instance.set_reverse_sort(reverse_sort);
 
     ImGui::Dummy(ImVec2(10, 30));
 

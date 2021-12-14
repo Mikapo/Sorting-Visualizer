@@ -1,7 +1,8 @@
 #include "Sorter.h"
 #include <random>
 
-sorter::sorter() : m_current_sort(sorts::selection_sort), m_max_size(75), m_delay(1), m_is_sorting(false)
+sorter::sorter()
+    : m_current_sort(sorts::selection_sort), m_max_size(75), m_delay(1), m_reverse_sort(false), m_is_sorting(false)
 {
     m_items.reserve(20);
     for (unsigned int i = 0; i < 20; i++)
@@ -55,7 +56,14 @@ void sorter::start_sort()
     if (m_is_sorting)
         return;
 
-    auto greater_than = [](int a, int b) { return a > b; };
+    std::function<bool(int, int)> comparing_method;
+
+    if (!m_reverse_sort)
+        comparing_method = [](int a, int b) { return a > b; };
+    else
+    {
+        comparing_method = [](int a, int b) { return a < b; };
+    }
 
     m_output = sorting_output();
     m_is_sorting = true;
@@ -64,43 +72,43 @@ void sorter::start_sort()
     case sorts::selection_sort:
         m_sorting = std::async(
             std::launch::async, selection_sort, std::ref(m_items), std::ref(m_output), std::ref(m_is_sorting), m_delay,
-            greater_than);
+            comparing_method);
         break;
 
     case sorts::insertion_sort:
         m_sorting = std::async(
             std::launch::async, insertion_sort, std::ref(m_items), std::ref(m_output), std::ref(m_is_sorting), m_delay,
-            greater_than);
+            comparing_method);
         break;
 
     case sorts::shell_sort:
         m_sorting = std::async(
             std::launch::async, shell_sort, std::ref(m_items), std::ref(m_output), std::ref(m_is_sorting), m_delay,
-            greater_than);
+            comparing_method);
         break;
 
     case sorts::merge_sort:
         m_sorting = std::async(
             std::launch::async, merge_sort, std::ref(m_items), std::ref(m_output), std::ref(m_is_sorting), m_delay,
-            greater_than);
+            comparing_method);
         break;
 
     case sorts::botton_up_merge_sort:
         m_sorting = std::async(
             std::launch::async, botton_up_merge_sort, std::ref(m_items), std::ref(m_output), std::ref(m_is_sorting),
-            m_delay, greater_than);
+            m_delay, comparing_method);
         break;
 
     case sorts::quick_sort:
         m_sorting = std::async(
             std::launch::async, quick_sort, std::ref(m_items), std::ref(m_output), std::ref(m_is_sorting), m_delay,
-            greater_than);
+            comparing_method);
         break;
 
     case sorts::heap_sort:
         m_sorting = std::async(
             std::launch::async, heap_sort, std::ref(m_items), std::ref(m_output), std::ref(m_is_sorting), m_delay,
-            greater_than);
+            comparing_method);
         break;
     }
 }
@@ -115,7 +123,8 @@ void sorter::swap(std::vector<int>& input, size_t index_1, size_t index_2)
 }
 
 void sorter::selection_sort(
-    std::vector<int>& input, sorting_output& output, bool& on_going, int delay, bool (*greater_than)(int a, int b))
+    std::vector<int>& input, sorting_output& output, bool& on_going, int delay,
+    std::function<bool(int, int)> comparing_method)
 {
     size_t size = input.size();
     for (int i = 0; i < size; i++)
@@ -130,7 +139,7 @@ void sorter::selection_sort(
             output.second_cursor_position = a;
             std::this_thread::sleep_for(std::chrono::milliseconds(delay));
             ++output.comparisons;
-            if (greater_than(input[smallest_value], input[a]))
+            if (comparing_method(input[smallest_value], input[a]))
                 smallest_value = a;
         }
         ++output.swaps;
@@ -141,7 +150,8 @@ void sorter::selection_sort(
 }
 
 void sorter::insertion_sort(
-    std::vector<int>& input, sorting_output& output, bool& on_going, int delay, bool (*greater_than)(int a, int b))
+    std::vector<int>& input, sorting_output& output, bool& on_going, int delay,
+    std::function<bool(int, int)> comparing_method)
 {
     int size = input.size();
     for (int i = 0; i < size; i++)
@@ -155,7 +165,7 @@ void sorter::insertion_sort(
             output.second_cursor_position = a;
             std::this_thread::sleep_for(std::chrono::milliseconds(delay));
             ++output.comparisons;
-            if (!greater_than(input[a], input[a - 1]))
+            if (!comparing_method(input[a], input[a - 1]))
             {
                 ++output.swaps;
                 swap(input, a, a - 1);
@@ -168,7 +178,8 @@ void sorter::insertion_sort(
 }
 
 void sorter::shell_sort(
-    std::vector<int>& input, sorting_output& output, bool& on_going, int delay, bool (*greater_than)(int a, int b))
+    std::vector<int>& input, sorting_output& output, bool& on_going, int delay,
+    std::function<bool(int, int)> comparing_method)
 {
     int size = input.size();
     int h = 1;
@@ -188,7 +199,7 @@ void sorter::shell_sort(
                 output.second_cursor_position = a;
                 std::this_thread::sleep_for(std::chrono::milliseconds(delay));
                 ++output.comparisons;
-                if (!greater_than(input[a], input[a - h]))
+                if (!comparing_method(input[a], input[a - h]))
                 {
                     ++output.swaps;
                     swap(input, a, a - h);
@@ -205,7 +216,7 @@ void sorter::shell_sort(
 
 void sorter::merge(
     std::vector<int>& input, std::vector<int>& aux, sorting_output& output, bool& on_going, int lo, int mid, int hi,
-    bool (*higher_than)(int a, int b), int delay)
+    std::function<bool(int, int)> comparing_method, int delay)
 {
     for (int i = lo; i <= hi; i++)
         aux[i] = input[i];
@@ -230,7 +241,7 @@ void sorter::merge(
             input[k] = aux[i];
             ++i;
         }
-        else if (!higher_than(aux[j], aux[i]))
+        else if (!comparing_method(aux[j], aux[i]))
         {
             ++output.comparisons;
             ++output.swaps;
@@ -249,7 +260,7 @@ void sorter::merge(
 
 void sorter::merge_sort_recrussion(
     std::vector<int>& input, std::vector<int>& aux, sorting_output& output, bool& on_going, int lo, int hi,
-    bool (*higher_than)(int a, int b), int delay)
+    std::function<bool(int, int)> comparing_method, int delay)
 {
     if (hi <= lo)
         return;
@@ -259,25 +270,27 @@ void sorter::merge_sort_recrussion(
 
     int mid = lo + (hi - lo) / 2;
 
-    merge_sort_recrussion(input, aux, output, on_going, lo, mid, higher_than, delay);
-    merge_sort_recrussion(input, aux, output, on_going, mid + 1, hi, higher_than, delay);
-    merge(input, aux, output, on_going, lo, mid, hi, higher_than, delay);
+    merge_sort_recrussion(input, aux, output, on_going, lo, mid, comparing_method, delay);
+    merge_sort_recrussion(input, aux, output, on_going, mid + 1, hi, comparing_method, delay);
+    merge(input, aux, output, on_going, lo, mid, hi, comparing_method, delay);
 }
 
 void sorter::merge_sort(
-    std::vector<int>& input, sorting_output& output, bool& on_going, int delay, bool (*greater_than)(int a, int b))
+    std::vector<int>& input, sorting_output& output, bool& on_going, int delay,
+    std::function<bool(int, int)> comparing_method)
 {
     std::vector<int> aux;
     aux.reserve(input.size());
     for (int item : input)
         aux.push_back(item);
 
-    merge_sort_recrussion(input, aux, output, on_going, 0, input.size() - 1, greater_than, delay);
+    merge_sort_recrussion(input, aux, output, on_going, 0, input.size() - 1, comparing_method, delay);
     on_going = false;
 }
 
 void sorter::botton_up_merge_sort(
-    std::vector<int>& input, sorting_output& output, bool& on_going, int delay, bool (*greater_than)(int a, int b))
+    std::vector<int>& input, sorting_output& output, bool& on_going, int delay,
+    std::function<bool(int, int)> comparing_method)
 {
     std::vector<int> aux;
     aux.reserve(input.size());
@@ -290,21 +303,21 @@ void sorter::botton_up_merge_sort(
             if (!on_going)
                 return;
             merge(
-                input, aux, output, on_going, a, a + i - 1, std::min(a + i + i - 1, input.size() - 1), greater_than,
+                input, aux, output, on_going, a, a + i - 1, std::min(a + i + i - 1, input.size() - 1), comparing_method,
                 delay);
         }
     on_going = false;
 }
 
 int sorter::partition(
-    std::vector<int>& input, sorting_output& output, bool& on_going, int lo, int hi, bool (*higher_than)(int a, int b),
-    int delay)
+    std::vector<int>& input, sorting_output& output, bool& on_going, int lo, int hi,
+    std::function<bool(int, int)> comparing_method, int delay)
 {
     int i = lo, j = hi + 1;
 
     while (true)
     {
-        while (!higher_than(input[++i], input[lo]))
+        while (!comparing_method(input[++i], input[lo]))
         {
             if (!on_going)
                 return 0;
@@ -314,7 +327,7 @@ int sorter::partition(
                 break;
         }
 
-        while (!higher_than(input[lo], input[--j]))
+        while (!comparing_method(input[lo], input[--j]))
         {
             if (!on_going)
                 return 0;
@@ -339,7 +352,8 @@ int sorter::partition(
 }
 
 void sorter::heap_sort(
-    std::vector<int>& input, sorting_output& output, bool& on_going, int delay, bool (*greater_than)(int a, int b))
+    std::vector<int>& input, sorting_output& output, bool& on_going, int delay,
+    std::function<bool(int, int)> comparing_method)
 {
     int size = input.size();
     output.first_cursor_position = size - 1;
@@ -347,7 +361,7 @@ void sorter::heap_sort(
     {
         if (!on_going)
             return;
-        sink(input, output, on_going, delay, i, size, greater_than);
+        sink(input, output, on_going, delay, i, size, comparing_method);
     }
 
     while (size > 1)
@@ -359,7 +373,7 @@ void sorter::heap_sort(
         ++output.swaps;
         output.first_cursor_position = size - 1;
         swap(input, 0, size - 1);
-        sink(input, output, on_going, delay, 0, --size, greater_than);
+        sink(input, output, on_going, delay, 0, --size, comparing_method);
     }
 
     on_going = false;
@@ -367,9 +381,9 @@ void sorter::heap_sort(
 
 void sorter::sink(
     std::vector<int>& input, sorting_output& output, bool& on_going, int delay, int index, int size,
-    bool (*greater_than)(int a, int b))
+    std::function<bool(int, int)> comparing_method)
 {
-    while ((index * 2) <= size-1)
+    while ((index * 2) <= size - 1)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
         int j = 2 * index;
@@ -377,11 +391,11 @@ void sorter::sink(
         output.second_cursor_position = index;
 
         ++output.comparisons;
-        if (j < size - 1 && !greater_than(input[j], input[j + 1]))
+        if (j < size - 1 && !comparing_method(input[j], input[j + 1]))
             ++j;
 
         ++output.comparisons;
-        if (greater_than(input[index], input[j]) || input[index] == input[j])
+        if (comparing_method(input[index], input[j]) || input[index] == input[j])
             break;
 
         if (!on_going)
@@ -394,8 +408,8 @@ void sorter::sink(
 }
 
 void sorter::quick_sort_recrussion(
-    std::vector<int>& input, sorting_output& output, bool& on_going, int lo, int hi, bool (*greater_than)(int a, int b),
-    int delay)
+    std::vector<int>& input, sorting_output& output, bool& on_going, int lo, int hi,
+    std::function<bool(int, int)> comparing_method, int delay)
 {
     if (hi <= lo)
         return;
@@ -403,17 +417,18 @@ void sorter::quick_sort_recrussion(
     if (!on_going)
         return;
 
-    int j = partition(input, output, on_going, lo, hi, greater_than, delay);
-    quick_sort_recrussion(input, output, on_going, lo, j - 1, greater_than, delay);
-    quick_sort_recrussion(input, output, on_going, j + 1, hi, greater_than, delay);
+    int j = partition(input, output, on_going, lo, hi, comparing_method, delay);
+    quick_sort_recrussion(input, output, on_going, lo, j - 1, comparing_method, delay);
+    quick_sort_recrussion(input, output, on_going, j + 1, hi, comparing_method, delay);
 }
 
 void sorter::quick_sort(
-    std::vector<int>& input, sorting_output& output, bool& on_going, int delay, bool (*greater_than)(int a, int b))
+    std::vector<int>& input, sorting_output& output, bool& on_going, int delay,
+    std::function<bool(int, int)> comparing_method)
 {
     auto rng = std::default_random_engine{};
     std::shuffle(std::begin(input), std::end(input), rng);
-    quick_sort_recrussion(input, output, on_going, 0, input.size() - 1, greater_than, delay);
+    quick_sort_recrussion(input, output, on_going, 0, input.size() - 1, comparing_method, delay);
 
     on_going = false;
 }
